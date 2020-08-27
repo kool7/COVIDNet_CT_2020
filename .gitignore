@@ -8,3 +8,5 @@ explain/
 models/
 output/
 gensynth/
+COVIDNet-CT-A/
+data.csv

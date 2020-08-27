@@ -258,6 +258,7 @@ class COVIDNetCTRunner:
             print('Do not use this prediction for self-diagnosis. '
                   'You should check with your local authorities for '
                   'the latest advice on seeking medical assistance.')
+            return CLASS_NAMES[class_[0]],  max(probs[0])
 
     def _get_validation_fn(self, sess, batch_size=1, val_split_file='val.txt'):
         """Creates validation function to call in self.trainval() or self.test()"""
@@ -372,4 +373,23 @@ if __name__ == '__main__':
         )
     elif mode == 'infer':
         # Run inference
-        runner.infer(args.image_file, args.auto_crop)
+        images = []
+        ROOT = '/content/drive/My Drive/Data/CT'
+        for dirpath,_,filenames in os.walk(ROOT):
+            for f in filenames:
+                image = os.path.abspath(os.path.join(dirpath, f))
+                images.append(image)
+        covid_data = []
+        for image_file in images:
+          b, bn = runner.infer(image_file, args.auto_crop)
+          covid_data.append((image_file.split('/')[-1], b, bn, str(round(bn * 100, 1))+' %'))
+        covid = pd.DataFrame(covid_data, columns=['File Name', 'Finding Labels', 'Confidence', 'Percentage'])
+        covid.to_csv('data.csv')
+
+
+
+
+
+
+
+
